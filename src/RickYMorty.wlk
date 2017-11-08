@@ -12,7 +12,7 @@
  * 	recuperar(_energia)
  * ****************************
  * 
- * Materiales
+* Materiales
  * 	grMetal
  * 	conduceE
  * 	esRadioactivo
@@ -67,3 +67,35 @@
  * 
  * cosa nueva
  */
+
+//==================================================
+//-------------------------------------------- MORTY
+//==================================================
+
+object morty{
+	
+	var energia
+	var mochila //maximo 3 materiales a la vez.
+	
+	method puedeRecolectar(_unMaterial){
+		return energia >= _unMaterial.grMetal() and mochila.size() < 3
+	}
+	
+	method recolectar(_unMaterial){
+		if(self.puedeRecolectar(_unMaterial)){
+			mochila.add(_unMaterial)
+		}
+		else
+			self.error("no se pudo recolectar")
+		
+	}
+	
+	method darObjetosA(_unCompanero){//saca todas las cosas de su mochila y se las pasa a un compañero
+	
+	}
+	
+	method agotar(_energia){}
+  	
+  	method recuperar(_energia){}
+	
+}
