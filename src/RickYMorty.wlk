@@ -12,7 +12,7 @@
  * 	recuperar(_energia)
  * ****************************
  * 
-* Materiales
+ * Materiales
  * 	grMetal
  * 	conduceE
  * 	esRadioactivo
@@ -98,4 +98,98 @@ object morty{
   	
   	method recuperar(_energia){}
 	
+}
+
+
+
+
+
+
+//=============================================================
+//-------- Material -------------------------------------------
+//=============================================================
+class Material {
+	var grMetal
+	var conduceE
+	var esRadioactivo
+	var generaE
+	
+	/*constructor(_grMetal,_conduceE,_esRadioactivo,_generaE) {
+		grMetal = _grMetal
+		conduceE = _conduceE
+		esRadioactivo = _esRadioactivo
+		generaE = _generaE
+	}*/
+	
+	method grMetal() = grMetal
+	method conduceE() = conduceE
+	method esRadioactivo() = esRadioactivo
+	method generaE() = generaE
+	
+	method energiaNecesaria() = self.grMetal() 
+	method descontarEnergia(companiero) { companiero.energia(companiero.energia() - self.energiaNecesaria()) }
+}
+/************************************************************/
+class Lata inherits Material {
+	
+	constructor(_grMetal) {
+		grMetal = _grMetal
+		esRadioactivo = false
+		generaE = 0
+	}
+	
+	override method conduceE() = 0.1 * grMetal
+}
+/************************************************************/
+class Cable inherits Material {
+	var longitud //variable
+	var seccion //variable
+	
+	constructor(_longitud, _seccion) {
+		longitud = _longitud
+		seccion = _seccion
+		esRadioactivo = false
+		generaE = 0
+	}
+	
+	override method grMetal() = ((longitud / 1000) * seccion)
+	override method conduceE() = seccion * 3
+}
+/************************************************************/
+class Fleeb inherits Material {
+	var materiales = #{}
+	var anios
+	
+	constructor(_materiales, _anios){
+		materiales = _materiales
+		anios = _anios
+	}
+	
+	method agregarmaterial(_material){ materiales.add(_material) }
+	method anios(_anios) { anios = _anios }
+	
+	override method grMetal() = materiales.sum({m => m.grMetal()})
+	override method conduceE() = materiales.max({m => m.conduceE()}).conduceE()
+	override method esRadioactivo() = anios > 15
+	override method generaE() = materiales.min({m => m.generaE()}).generaE()
+	
+	override method energiaNecesaria() = super() * 2
+	override method descontarEnergia(companiero) {
+		if (!self.esRadioactivo()) {
+			companiero.energia(companiero.energia() + 10)
+		} 
+	}
+}
+/************************************************************/
+class MateriaOscura inherits Material {
+	var materiaBase //variable
+	
+	constructor(_materiaBase) {
+		materiaBase = _materiaBase
+		esRadioactivo = false
+	}
+	
+	override method grMetal() = materiaBase.grMetal()
+	override method conduceE() = materiaBase.conduceE()
+	override method generaE() = materiaBase.generaE() * 2
 }
