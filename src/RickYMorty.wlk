@@ -78,7 +78,7 @@ object morty{
 	var mochila = #{}//maximo 3 materiales a la vez.
 	
 	method puedeRecolectar(_unMaterial){
-		return energia >= _unMaterial.grMetal() and mochila.size() < 3
+		return energia >= _unMaterial.energiaNecesaria() and mochila.size() < 3
 	}
 	
 	method recolectar(_unMaterial){
@@ -232,6 +232,82 @@ object rick {
 }
 
 
-	
-	
+//Materiales Generables
+class Bateria inherits Material {
+	constructor(materiales) {
+		grMetal = materiales.sum({m => m.grMetal()})
+		conduceE = 0
+		esRadioactivo = true
+		generaE = grMetal * 2
+	}
 }
+class Circuito inherits Material {
+	constructor(materiales) {
+		grMetal = materiales.sum({m => m.grMetal()})
+		conduceE = materiales.sum({m => m.conduceE()}) * 3
+		esRadioactivo = materiales.any({m => m.esRadioactivo()})
+		generaE = 0
+	}
+}
+
+//Experimentos
+object construirBateria {
+	method buscarMateriales(mochila) {
+		var materialesMetaleros = mochila.filter({m => m.grMetal() > 200})
+		var materialesRadiactivos = mochila.filter({m => m.esRadioactivo()})
+		var materialesSeleccionados = #{}
+		
+		//habria que validar que los materiales no se repitan ni quedarse corto innecesariamente
+		return materialesSeleccionados
+	}
+	method puedeRealizarse(mochila) = self.buscarMateriales(mochila).size() == 2
+	
+	method realizar(mochila, companiero) {
+		if (self.puedeRealizarse(mochila)) {
+			var materiales = self.buscarMateriales(mochila)
+			mochila.removeAll(materiales)
+			mochila.add(new Bateria(materiales))
+			companiero.energia((companiero.energia() - 5).max(0))
+		}
+		else {
+			self.error("No se puede realizar el experimento.")
+		}
+	}
+}
+object construirCircuito {
+	
+	method buscarMateriales(mochila) = mochila.filter({m => m.conduceE() >= 5})
+	
+	method puedeRealizarse(mochila) = self.buscarMateriales(mochila).size() > 0
+	
+	method realizar(mochila, companiero) {
+		if (self.puedeRealizarse(mochila)) {
+			var materiales = self.buscarMateriales(mochila)
+			mochila.removeAll(materiales)
+			mochila.add(new Circuito(materiales))
+		}
+		else {
+			self.error("No se puede realizar el experimento.")
+		}
+	}
+}
+object shockElectrico {
+	
+	method buscarMateriales(mochila) {
+		var generador = mochila.filter({m => m.generaE() > 0})
+		var conductor = mochila.filter({m => m.conduceE() > 0})
+		// falta seguir
+	}
+	
+	method puedeRealizarse(mochila) = self.buscarMateriales(mochila).size() == 2
+	
+	method realizar(mochila, companiero) {
+		companiero.energia(companiero.energia() + (generador.generaE() * conductor.conduceE()))
+	}
+}
+	
+	
+	
+	
+	
+	
