@@ -8,7 +8,7 @@
  * 		//necetita tanta energia como grMetal del elemento
  * 		//Al recolectar materiales radiactivos, la energía de Morty disminuye en la cantidad requerida luego de la acción
  * 	darObjetosA(unCompanero)//saca todas las cosas de su mochila y se las pasa a un compañero
- * 	agotar(_energia)
+ * 	reducir(_energia)
  * 	recuperar(_energia)
  * ****************************
  * 
@@ -75,7 +75,7 @@
 object morty{
 	
 	var energia
-	var mochila //maximo 3 materiales a la vez.
+	var mochila = #{}//maximo 3 materiales a la vez.
 	
 	method puedeRecolectar(_unMaterial){
 		return energia >= _unMaterial.grMetal() and mochila.size() < 3
@@ -91,18 +91,25 @@ object morty{
 	}
 	
 	method darObjetosA(_unCompanero){//saca todas las cosas de su mochila y se las pasa a un compañero
-	
+		_unCompanero.recibir(self.mochila())
+		mochila.clear()
 	}
 	
-	method agotar(_energia){}
+	method mochila() = mochila // Este método devuelve la lista con todos los materiales de la mochila.
+	
+	method recibir(unosMateriales){
+		mochila.union(unosMateriales)
+	}
+	
+	method reducir(_energia){
+		energia -= _energia
+	}
   	
-  	method recuperar(_energia){}
+  	method recuperar(_energia){
+  		energia += _energia
+  	}
 	
 }
-
-
-
-
 
 
 //=============================================================
@@ -192,4 +199,39 @@ class MateriaOscura inherits Material {
 	override method grMetal() = materiaBase.grMetal()
 	override method conduceE() = materiaBase.conduceE()
 	override method generaE() = materiaBase.generaE() * 2
+}
+
+//=============================================================
+//--------------------- PARTE 2 -------------------------------
+//=============================================================
+
+object rick {
+	
+	var mochila = #{}
+	var companero = morty // el enunciado aclara que en este caso el compañero es Morty, pero en otros universos puede cambiar.
+	
+	method asignarCompanero(unCompanero){
+		companero = unCompanero
+	}
+	
+	method darObjetosA(_unCompanero){//saca todas las cosas de su mochila y se las pasa a un compañero
+		_unCompanero.recibir(self.mochila())
+		mochila.clear()
+	}
+	
+	method mochila() = mochila // Este método devuelve la lista con todos los materiales de la mochila.
+	
+	method recibir(unosMateriales){
+		mochila.union(unosMateriales)
+	}
+	
+	method experimentosQuePuedeRealizar(){}
+	
+	method realizar(unExperimento){}
+	
+}
+
+
+	
+	
 }
