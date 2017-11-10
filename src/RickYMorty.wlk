@@ -138,29 +138,21 @@ class Material {
 }
 /************************************************************/
 class Lata inherits Material {
-	
 	constructor(_grMetal) {
 		grMetal = _grMetal
+		conduceE = 0.1 * _grMetal
 		esRadioactivo = false
 		generaE = 0
 	}
-	
-	override method conduceE() = 0.1 * grMetal
 }
 /************************************************************/
 class Cable inherits Material {
-	var longitud //variable
-	var seccion //variable
-	
-	constructor(_longitud, _seccion) {
-		longitud = _longitud
-		seccion = _seccion
+	constructor(longitud, seccion) {
+		grMetal = ((longitud / 1000) * seccion)
+		conduceE = seccion * 3
 		esRadioactivo = false
 		generaE = 0
 	}
-	
-	override method grMetal() = ((longitud / 1000) * seccion)
-	override method conduceE() = seccion * 3
 }
 /************************************************************/
 class Fleeb inherits Material {
@@ -196,6 +188,10 @@ class MateriaOscura inherits Material {
 		esRadioactivo = false
 	}
 	
+	method materiaBase(_materiaBase){
+		materiaBase = _materiaBase
+	}
+	
 	override method grMetal() = materiaBase.grMetal()
 	override method conduceE() = materiaBase.conduceE()
 	override method generaE() = materiaBase.generaE() * 2
@@ -206,18 +202,19 @@ class MateriaOscura inherits Material {
 //=============================================================
 
 object rick {
-	
 	var mochila = #{}
-	var companero = morty // el enunciado aclara que en este caso el compañero es Morty, pero en otros universos puede cambiar.
+	var companiero = morty // el enunciado aclara que en este caso el compañero es Morty, pero en otros universos puede cambiar.
+	var experimentos = #{construirBateria, construirCircuito, shockElectrico}
 	
 	method asignarCompanero(unCompanero){
-		companero = unCompanero
+		companiero = unCompanero
 	}
 	
-	method darObjetosA(_unCompanero){//saca todas las cosas de su mochila y se las pasa a un compañero
+	//Comente este metodo porque no lo pedia y haria quilombo si tubiera mas materiales de los que puede recibir el companiero
+	/*method darObjetosA(_unCompanero){//saca todas las cosas de su mochila y se las pasa a un compañero
 		_unCompanero.recibir(self.mochila())
 		mochila.clear()
-	}
+	}*/
 	
 	method mochila() = mochila // Este método devuelve la lista con todos los materiales de la mochila.
 	
@@ -225,14 +222,20 @@ object rick {
 		mochila.union(unosMateriales)
 	}
 	
-	method experimentosQuePuedeRealizar(){}
+	method experimentosQuePuedeRealizar() {
+		return experimentos.filter({e => e.puedeRealizarse(mochila)})
+	}
 	
-	method realizar(unExperimento){}
+	method realizar(unExperimento) {
+		unExperimento.realizar(mochila, companiero)
+	}
 	
 }
 
 
+/************************************************************/
 //Materiales Generables
+/************************************************************/
 class Bateria inherits Material {
 	constructor(materiales) {
 		grMetal = materiales.sum({m => m.grMetal()})
@@ -241,6 +244,7 @@ class Bateria inherits Material {
 		generaE = grMetal * 2
 	}
 }
+/************************************************************/
 class Circuito inherits Material {
 	constructor(materiales) {
 		grMetal = materiales.sum({m => m.grMetal()})
@@ -249,22 +253,51 @@ class Circuito inherits Material {
 		generaE = 0
 	}
 }
-
+/************************************************************/
 //Experimentos
-object construirBateria {
-	method buscarMateriales(mochila) {
-		var materialesMetaleros = mochila.filter({m => m.grMetal() > 200})
-		var materialesRadiactivos = mochila.filter({m => m.esRadioactivo()})
-		var materialesSeleccionados = #{}
+/************************************************************/
+class Experimento {
+	method buscar2Materiales(mochila, cond1, cond2) {
+		//armo un conjunto con todos los materiales con mas de 200gr de metal y otro con los radiactivos
+		var materialesCond1 = mochila.filter(cond1) 
+		var materialesCond2 = mochila.filter(cond2)
+		var materialesSeleccionados = [] //lista de materiales que se retornaran
 		
-		//habria que validar que los materiales no se repitan ni quedarse corto innecesariamente
+		//Reviso que haya por lo menos un material en cada conjunto
+		if (materialesCond1.size() > 0 && materialesCond2.size() > 0) { 
+			//Primero busco un material que solo cumpla la condicion >200gr metal para evitar que mas adelante me pueda limitar en la seleccion del segundo material
+			//Si no existe busco cualquiera de ese conjunto
+			if (materialesCond1.difference(materialesCond2).size() > 0) {
+				materialesSeleccionados.add(materialesCond1.difference(materialesCond2).anyOne())
+			}
+			else {
+				materialesSeleccionados.add(materialesCond1.anyOne())
+			}
+			//a esta altura ya tendria el primer elemento de la mochila seleccionado ya que por lo menos hay uno >200gr metal
+			//ahora busco algun otro que cumpla la segunda condicion
+			if (materialesCond2.difference(materialesSeleccionados).size() > 0) {
+				materialesSeleccionados.add(materialesCond2.difference(materialesSeleccionados).anyOne())
+			}
+			//si no encuentra un elemento limpio la lista ya que se necesitan 2 para realizar el experimento
+			if (materialesSeleccionados.size()!=2) {
+				materialesSeleccionados.clear()
+			}
+		}
 		return materialesSeleccionados
 	}
-	method puedeRealizarse(mochila) = self.buscarMateriales(mochila).size() == 2
+}
+/************************************************************/
+object construirBateria inherits Experimento {
+	const condMat1 = {m => m.grMetal() > 200}
+	const condMat2 = {m => m.esRadioactivo()}
+	
+	method puedeRealizarse(mochila) {
+		return self.buscar2Materiales(mochila, condMat1, condMat2).size() == 2
+	}
 	
 	method realizar(mochila, companiero) {
 		if (self.puedeRealizarse(mochila)) {
-			var materiales = self.buscarMateriales(mochila)
+			var materiales = self.buscar2Materiales(mochila, condMat1, condMat2)
 			mochila.removeAll(materiales)
 			mochila.add(new Bateria(materiales))
 			companiero.energia((companiero.energia() - 5).max(0))
@@ -274,6 +307,7 @@ object construirBateria {
 		}
 	}
 }
+/************************************************************/
 object construirCircuito {
 	
 	method buscarMateriales(mochila) = mochila.filter({m => m.conduceE() >= 5})
@@ -291,18 +325,24 @@ object construirCircuito {
 		}
 	}
 }
-object shockElectrico {
+/************************************************************/
+object shockElectrico inherits Experimento {
+	const condMat1 = {m => m.generaE() > 0}
+	const condMat2 = {m => m.conduceE() > 0}
 	
-	method buscarMateriales(mochila) {
-		var generador = mochila.filter({m => m.generaE() > 0})
-		var conductor = mochila.filter({m => m.conduceE() > 0})
-		// falta seguir
+	method puedeRealizarse(mochila) {
+		return self.buscar2Materiales(mochila, condMat1, condMat2).size() == 2
 	}
 	
-	method puedeRealizarse(mochila) = self.buscarMateriales(mochila).size() == 2
-	
 	method realizar(mochila, companiero) {
-		companiero.energia(companiero.energia() + (generador.generaE() * conductor.conduceE()))
+		if (self.puedeRealizarse(mochila)) {
+			var materiales = self.buscar2Materiales(mochila, condMat1, condMat2)
+			mochila.removeAll(materiales)
+			companiero.energia(companiero.energia() + (materiales.first().generaE() * materiales.last().conduceE()))
+		}
+		else {
+			self.error("No se puede realizar el experimento.")
+		}
 	}
 }
 	
