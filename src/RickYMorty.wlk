@@ -1,80 +1,10 @@
-/* 
- * Morty
- * 	energia
- * 	materiales //hasta 3
- * 	
- * 	puedeRecolectar(unMaterial)
- * 	recolectar(unMaterial)//la recolecta (si puede) y se la guarda en su mochila.
- * 		//necetita tanta energia como grMetal del elemento
- * 		//Al recolectar materiales radiactivos, la energía de Morty disminuye en la cantidad requerida luego de la acción
- * 	darObjetosA(unCompanero)//saca todas las cosas de su mochila y se las pasa a un compañero
- * 	reducir(_energia)
- * 	recuperar(_energia)
- * ****************************
- * 
- * Materiales
- * 	grMetal
- * 	conduceE
- * 	esRadioactivo
- * 	generaE
- * 	
- * 	energiaNecesaria() = self.grMetal() 
- * 	descontarEnergia(companiero) { companiero.energia(companiero.energia() - self.energiaNecesaria()) }
- * 
- * 
- * Lata
- * 	grMetal //variable
- * 	conduceE = 0.1 * grMetal
- * 	esRadioactivo=false
- * 	generaE = 0
- * 
- * Cable
- * 	grMetal = ((longitud / 1000) * seccion)
- * 	conduceE = seccion * 3
- * 	esRadioactivo = false
- * 	generaE = 0
- * 	longitud //variable
- * 	seccion //variable
- * 
- * Fleeb
- * 	grMetal = materiales.sum({m => m.grMetal()})
- * 	conduceE = materiales.max({m => m.conduceE()}).conduceE()
- * 	esRadioactivo = anios>15
- * 	generaE = materiales.min({m => m.generaE()}).generaE()
- * 	materiales = #{}
- * 	anios //variable
- * 
- * 	override energiaNecesaria() = super() * 2
- * 	override descontarEnergia(companiero) {
- * 		if (!self.esRadioactivo()) {
- * 			companiero.energia(companiero.energia() + 10)
- * 		} 
- * 	}
- * 
- * MateriaOscura
- * 	grMetal = materiaBase.grMetal()
- * 	conduceE = materiaBase.conduceE()
- * 	esRadioactivo = false
- * 	generaE = materiaBase.generaE() * 2
- * 	materiaBase //variable
- * 
- * ************************
- * Rick
- * 	companero
- * 	mochila
- * 
- * 
- * 
- * cosa nueva
- */
-
 //==================================================
 //-------------------------------------------- MORTY
 //==================================================
 
 object morty{
 	
-	var energia
+	var energia = 0
 	var mochila = #{}//maximo 3 materiales a la vez.
 	
 	method puedeRecolectar(_unMaterial){
@@ -84,17 +14,19 @@ object morty{
 	method recolectar(_unMaterial){
 		if(self.puedeRecolectar(_unMaterial)){
 			mochila.add(_unMaterial)
+			_unMaterial.descontarEnergia(self)
 		}
-		else
-			self.error("no se pudo recolectar")
-		
+		else {
+			self.error("No se pudo recolectar")
+		}
 	}
 	
 	method darObjetosA(_unCompanero){//saca todas las cosas de su mochila y se las pasa a un compañero
-		_unCompanero.recibir(self.mochila())
+		_unCompanero.recibir(mochila)
 		mochila.clear()
 	}
 	
+	method energia() = energia
 	method mochila() = mochila // Este método devuelve la lista con todos los materiales de la mochila.
 	
 	/*method recibir(unosMateriales){
@@ -102,7 +34,7 @@ object morty{
 	} morty no necesita este metodo*/
 	
 	method reducirEnergia(_energia){
-		energia -= _energia
+		energia = (energia - _energia).max(0)
 	}
   	
   	method recuperarEnergia(_energia){
@@ -160,7 +92,7 @@ class Fleeb inherits Material {
 	var anios
 	
 	constructor(_materiales, _anios){
-		materiales = _materiales
+		materiales.add(_materiales)
 		anios = _anios
 	}
 	
@@ -175,7 +107,7 @@ class Fleeb inherits Material {
 	override method energiaNecesaria() = super() * 2
 	override method descontarEnergia(companiero) {
 		if (!self.esRadioactivo()) {
-			companiero.energia(companiero.energia() + 10)
+			companiero.recuperarEnergia(10)
 		} 
 	}
 }
@@ -217,9 +149,10 @@ object rick {
 	}*/
 	
 	method mochila() = mochila // Este método devuelve la lista con todos los materiales de la mochila.
+	method companiero() = companiero
 	
 	method recibir(unosMateriales){
-		mochila.union(unosMateriales)
+		mochila.addAll(unosMateriales)
 	}
 	
 	method experimentosQuePuedeRealizar() {
@@ -303,7 +236,7 @@ object construirBateria inherits Experimento {
 			var materiales = self.buscar2Materiales(mochila, condMat1, condMat2)
 			mochila.removeAll(materiales)
 			mochila.add(new Bateria(materiales))
-			companiero.energia((companiero.energia() - 5).max(0))
+			companiero.reducirEnergia(5)
 		}
 		else {
 			self.error("No se puede realizar el experimento.")
@@ -341,7 +274,7 @@ object shockElectrico inherits Experimento {
 		if (self.puedeRealizarse(mochila)) {
 			var materiales = self.buscar2Materiales(mochila, condMat1, condMat2)
 			mochila.removeAll(materiales)
-			companiero.energia(companiero.energia() + (materiales.first().generaE() * materiales.last().conduceE()))
+			companiero.recuperarEnergia(materiales.first().generaE() * materiales.last().conduceE())
 		}
 		else {
 			self.error("No se puede realizar el experimento.")

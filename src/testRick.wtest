@@ -1,0 +1,50 @@
+import RickYMorty.*
+
+describe "Tests Rick" {
+	const lata10 = new Lata(10)
+	const lata250 = new Lata(250)
+	const cable2000x2 = new Cable(2000,2)
+	const cable3000x2 = new Cable(3000,2)
+	const fleeb = new Fleeb(lata10,16)
+	const materiaOscura = new MateriaOscura(cable3000x2)
+	
+	fixture {
+		morty.recuperarEnergia(280)
+		morty.recolectar(lata250) //Para construirBateria y construirCircuito
+		morty.recolectar(cable2000x2) //Para construirCircuito
+		morty.recolectar(materiaOscura) //Para construirCircuito
+		morty.darObjetosA(rick)
+		
+		morty.recolectar(fleeb) //Para construirBateria
+		morty.darObjetosA(rick)
+    }
+	
+	test "Rick - Mochila" {
+		const mochilaEsperado = #{ lata250, cable2000x2, materiaOscura, fleeb }
+		assert.equals(mochilaEsperado,rick.mochila())
+	}
+	
+	test "Rick - Experimentos para Realizar1" {
+		const mochilaEsperado = #{ construirBateria, construirCircuito }
+		assert.equals(mochilaEsperado,rick.experimentosQuePuedeRealizar())
+	}
+	test "Rick - Experimentos para Realizar2 (shockElectrico)" {
+		const mochilaEsperado = #{ construirCircuito, shockElectrico }
+		rick.realizar(construirBateria)
+		assert.equals(mochilaEsperado,rick.experimentosQuePuedeRealizar())
+	}
+	test "Rick - Hcer Experimento (mochila)" {
+		const mochilaSobrante = #{ cable2000x2, materiaOscura }
+		rick.realizar(construirBateria)
+		assert.equals(mochilaSobrante,rick.mochila().intersection(mochilaSobrante))
+		assert.equals(3,rick.mochila().size())
+	}
+	test "Rick - Hcer Experimento (compañero)" {
+		//En este punto Morty tiene 20 de energia
+		rick.mochila().clear()
+		rick.mochila().add(new Bateria(#{lata10})) //generaE = grMetal(10) * 2
+		rick.mochila().add(lata10) //conduceE = 0.1 * _grMetal(10)
+		rick.realizar(shockElectrico)
+		assert.equals((20+20),rick.companiero().energia())
+	}
+}
