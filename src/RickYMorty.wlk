@@ -97,15 +97,15 @@ object morty{
 	
 	method mochila() = mochila // Este método devuelve la lista con todos los materiales de la mochila.
 	
-	method recibir(unosMateriales){
+	/*method recibir(unosMateriales){
 		mochila.union(unosMateriales)
-	}
+	} morty no necesita este metodo*/
 	
-	method reducir(_energia){
+	method reducirEnergia(_energia){
 		energia -= _energia
 	}
   	
-  	method recuperar(_energia){
+  	method recuperarEnergia(_energia){
   		energia += _energia
   	}
 	
@@ -134,7 +134,7 @@ class Material {
 	method generaE() = generaE
 	
 	method energiaNecesaria() = self.grMetal() 
-	method descontarEnergia(companiero) { companiero.energia(companiero.energia() - self.energiaNecesaria()) }
+	method descontarEnergia(companiero) { companiero.reducirEnergia(self.energiaNecesaria()) }
 }
 /************************************************************/
 class Lata inherits Material {
@@ -285,17 +285,20 @@ class Experimento {
 		}
 		return materialesSeleccionados
 	}
+	
+	method realizar(mochila,companiero)
+	method puedeRealizarse(mochila)
 }
 /************************************************************/
 object construirBateria inherits Experimento {
 	const condMat1 = {m => m.grMetal() > 200}
 	const condMat2 = {m => m.esRadioactivo()}
 	
-	method puedeRealizarse(mochila) {
+	 override method puedeRealizarse(mochila) {
 		return self.buscar2Materiales(mochila, condMat1, condMat2).size() == 2
 	}
 	
-	method realizar(mochila, companiero) {
+	override method realizar(mochila, companiero) {
 		if (self.puedeRealizarse(mochila)) {
 			var materiales = self.buscar2Materiales(mochila, condMat1, condMat2)
 			mochila.removeAll(materiales)
@@ -330,11 +333,11 @@ object shockElectrico inherits Experimento {
 	const condMat1 = {m => m.generaE() > 0}
 	const condMat2 = {m => m.conduceE() > 0}
 	
-	method puedeRealizarse(mochila) {
+	override method puedeRealizarse(mochila) {
 		return self.buscar2Materiales(mochila, condMat1, condMat2).size() == 2
 	}
 	
-	method realizar(mochila, companiero) {
+	override method realizar(mochila, companiero) {
 		if (self.puedeRealizarse(mochila)) {
 			var materiales = self.buscar2Materiales(mochila, condMat1, condMat2)
 			mochila.removeAll(materiales)
