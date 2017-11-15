@@ -1,4 +1,6 @@
-import RickYMorty.*
+import Materiales.*
+import Experimentos.*
+import Personajes.*
 
 describe "Tests Rick" {
 	const lata10 = new Lata(10)
@@ -19,27 +21,24 @@ describe "Tests Rick" {
 		morty.darObjetosA(rick)
     }
 	
-	test "Rick - Mochila" {
-		const mochilaEsperado = #{ lata250, cable2000x2, materiaOscura, fleeb }
-		assert.equals(mochilaEsperado,rick.mochila())
+	test "Mochila" {
+		assert.equals(#{ lata250, cable2000x2, materiaOscura, fleeb },rick.mochila())
 	}
 	
-	test "Rick - Experimentos para Realizar1" {
-		const mochilaEsperado = #{ construirBateria, construirCircuito }
-		assert.equals(mochilaEsperado,rick.experimentosQuePuedeRealizar())
+	test "Experimentos para Realizar1 (construirBateria)" {
+		assert.equals(#{ construirBateria, construirCircuito },rick.experimentosQuePuedeRealizar())
 	}
-	test "Rick - Experimentos para Realizar2 (shockElectrico)" {
-		const mochilaEsperado = #{ construirCircuito, shockElectrico }
+	test "Experimentos para Realizar2 (shockElectrico)" {
 		rick.realizar(construirBateria)
-		assert.equals(mochilaEsperado,rick.experimentosQuePuedeRealizar())
+		assert.equals(#{ construirCircuito, shockElectrico },rick.experimentosQuePuedeRealizar())
 	}
-	test "Rick - Hcer Experimento (mochila)" {
+	test "Hcer Experimento (mochila)" {
 		const mochilaSobrante = #{ cable2000x2, materiaOscura }
 		rick.realizar(construirBateria)
 		assert.equals(mochilaSobrante,rick.mochila().intersection(mochilaSobrante))
 		assert.equals(3,rick.mochila().size())
 	}
-	test "Rick - Hcer Experimento (compañero)" {
+	test "Hcer Experimento (compañero)" {
 		//En este punto Morty tiene 20 de energia
 		rick.mochila().clear()
 		rick.mochila().add(new Bateria(#{lata10})) //generaE = grMetal(10) * 2

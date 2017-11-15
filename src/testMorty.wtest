@@ -1,4 +1,6 @@
-import RickYMorty.*
+import Materiales.*
+import Experimentos.*
+import Personajes.*
 
 describe "Tests Morty" {
 	const lata100 = new Lata(100)
@@ -14,23 +16,23 @@ describe "Tests Morty" {
 		morty.recolectar(cable2000x2)//EnergiaConsumida 104
     }
 	
-	test "Morty - Energia Consumida" {
+	test "Energia Consumida" {
 		morty.recuperarEnergia(6)
 		morty.recolectar(materiaOscura)//EnergiaConsumida 110
 		assert.equals(0,morty.energia())
 	}
-	test "Morty - Recolectar Fleeb" {
+	test "Recolectar Fleeb" {
 		// Necesita para recolectarlo el doble de la energia de lata250 y al consumirlo entrega 10
 		morty.recuperarEnergia(500)
 		morty.recolectar(fleeb)
 		assert.equals(510,morty.energia())
 	}
-	test "Morty - Recoleccion Error" {
+	test "Recoleccion Error" {
 		morty.recuperarEnergia(6)
 		morty.recolectar(materiaOscura)//EnergiaConsumida 110
 		assert.throwsExceptionWithMessage("No se pudo recolectar", {morty.recolectar(fleeb)})
 	}
-	test "Morty - Dar Materiales" {
+	test "Dar Materiales" {
 		morty.darObjetosA(rick)
 		assert.equals(#{}, morty.mochila())
 	}
