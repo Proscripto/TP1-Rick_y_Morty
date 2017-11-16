@@ -9,7 +9,8 @@ class Experimento {
 		var materialesSeleccionados = [] //lista de materiales que se retornaran
 		
 		//Reviso que haya por lo menos un material en cada conjunto
-		if (materialesCond1.size() > 0 && materialesCond2.size() > 0) { 
+		if (!materialesCond1.isEmpty() && !materialesCond2.isEmpty()) { 
+			/*
 			//Primero busco un material que solo cumpla la condicion >200gr metal para evitar que mas adelante me pueda limitar en la seleccion del segundo material
 			//Si no existe busco cualquiera de ese conjunto
 			if (materialesCond1.difference(materialesCond2).size() > 0) {
@@ -27,6 +28,9 @@ class Experimento {
 			if (materialesSeleccionados.size()!=2) {
 				materialesSeleccionados.clear()
 			}
+			*/
+			materialesSeleccionados.add(materialesCond1.anyOne())
+			materialesSeleccionados.add(materialesCond2.anyOne())
 		}
 		return materialesSeleccionados
 	}

@@ -30,7 +30,7 @@ describe "Tests Rick" {
 	}
 	test "Experimentos para Realizar2 (shockElectrico)" {
 		rick.realizar(construirBateria)
-		assert.equals(#{ construirCircuito, shockElectrico },rick.experimentosQuePuedeRealizar())
+		assert.equals(#{ construirBateria, construirCircuito, shockElectrico },rick.experimentosQuePuedeRealizar())
 	}
 	test "Hcer Experimento (mochila)" {
 		const mochilaSobrante = #{ cable2000x2, materiaOscura }
