@@ -40,6 +40,12 @@ object morty{
   	method recuperarEnergia(_energia){
   		energia += _energia
   	}
+  	
+  	method descartarMaterialAlAzar() {
+  		if (!mochila.isEmpty()){
+  			mochila.remove(mochila.anyOne())
+  		}
+  	}
 	
 }
 /************************************************************************************************/

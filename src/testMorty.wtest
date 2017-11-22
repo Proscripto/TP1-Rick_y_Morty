@@ -36,4 +36,14 @@ describe "Tests Morty" {
 		morty.darObjetosA(rick)
 		assert.equals(#{}, morty.mochila())
 	}
+	test "Material ParasitoAlienigena"{
+		morty.recuperarEnergia(20)
+		morty.recolectar(new ParasitoAlienigena([{comp => comp.darObjetosA(rick)}
+									,{comp => comp.reducirEnergia(10)}
+									,{comp => comp.recolectar(new Lata(5))}
+									,{comp => comp.recolectar(new Lata(5))}
+									,{comp => comp.descartarMaterialAlAzar()}]))
+		assert.equals(0, morty.energia())
+		assert.equals(1, morty.mochila().size())
+	}
 }

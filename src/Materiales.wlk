@@ -18,6 +18,7 @@ class Material {
 	method conduceE()
 	method esRadioactivo()
 	method generaE()
+	method estaVivo()
 	
 	method energiaNecesaria() = self.grMetal() 
 	method descontarEnergia(companiero) { companiero.reducirEnergia(self.energiaNecesaria()) }
@@ -34,6 +35,7 @@ class Lata inherits Material {
 	override method conduceE() = 0.1 * grMetal
 	override method esRadioactivo() = false
 	override method generaE() = 0
+	override method estaVivo() = false
 }
 /************************************************************/
 class Cable inherits Material {
@@ -49,6 +51,7 @@ class Cable inherits Material {
 	override method conduceE() = seccion * 3
 	override method esRadioactivo() = false
 	override method generaE() = 0
+	override method estaVivo() = false
 }
 /************************************************************/
 class Fleeb inherits Material {
@@ -67,6 +70,7 @@ class Fleeb inherits Material {
 	override method conduceE() = materiales.max({m => m.conduceE()}).conduceE()
 	override method esRadioactivo() = anios > 15
 	override method generaE() = materiales.min({m => m.generaE()}).generaE()
+	override method estaVivo() = true
 	
 	override method energiaNecesaria() = self.grMetal() * 2
 	override method descontarEnergia(companiero) {
@@ -91,9 +95,29 @@ class MateriaOscura inherits Material {
 	override method conduceE() = materiaBase.conduceE()
 	override method esRadioactivo() = false
 	override method generaE() = materiaBase.generaE() * 2
+	override method estaVivo() = false
 	
 	override method energiaNecesaria() = self.grMetal() 
 	override method descontarEnergia(companiero) { companiero.reducirEnergia(self.energiaNecesaria()) }
+}
+/************************************************************/
+class ParasitoAlienigena inherits Material {
+	var acciones
+	
+	constructor(_acciones) {
+		acciones = _acciones
+	}
+	
+	override method grMetal() = 10
+	override method conduceE() = 0
+	override method esRadioactivo() = false
+	override method generaE() = 5
+	override method estaVivo() = true
+	
+	override method descontarEnergia(companiero) {
+		//super(companiero)
+		acciones.forEach({a => a.apply(companiero)})
+	}
 }
 
 
@@ -111,6 +135,7 @@ class Bateria inherits Material {
 	override method conduceE() = 0
 	override method esRadioactivo() = true
 	override method generaE() = materiales.sum({m => m.grMetal()}) * 2
+	override method estaVivo() = false
 }
 /************************************************************/
 class Circuito inherits Material {
@@ -124,4 +149,5 @@ class Circuito inherits Material {
 	override method conduceE() = materiales.sum({m => m.conduceE()}) * 3
 	override method esRadioactivo() = materiales.any({m => m.esRadioactivo()})
 	override method generaE() = 0
+	override method estaVivo() = false
 }
