@@ -35,53 +35,15 @@ class Experimento {
 		return materialesSeleccionados
 	}
 	
-	method buscarMateriales(mochila)
-	//----------------------------------------------------------------Busqueda de Materiales con Estrategia
-	
-	//En esta parte se pide agregar un poquito de inteligencia en esa selección, configurando una
-	//estrategia de selección. Esta estrategia debe poder ser cambiada en cualquier momento del
-	//juego
-	
-	//Se elige cualquier elemento de la mochila que cumple con el requisito
-	method buscarMaterialAlAzar(mochila){
-		
-		return self.buscarMateriales(mochila) 
-		
-		//traer el primero o devolver el primero de un sort de la lista en el buscarMateriales(mochila) de cada Experimento????????
-		//mochila.filter(cond).first() 
-		//return mochila.filter(cond).sort().first()
-	}
-	
-	//de todos los elementos que cumplen el requisito, aquel que tiene la menor cantidad de metal
-	method buscarMaterialMenorCantidadDeMetal(listaFiltrada){
-		//siendo listaFiltrada una lista que ya paso por buscarMateriales(mochila)
-		return listaFiltrada.min({m => m.grMetal()})
-	}
-	
-	//de todos los elementos que cumplen el requisito, aquel que produce la mayor cantidad de energía
-	method buscarMaterialMejorGeneradorElectrico(listaFiltrada){
-		//siendo listaFiltrada una lista que ya paso por buscarMateriales(mochila)
-		return listaFiltrada.max({m => m.generaE()})
-	}
-	
-	//De entre todos los elementos que cumplen el requisito, intenta utilizar un ser vivo.
-	//En caso de que ninguno lo sea, intenta usar un elemento que no sea radiactivo.
-	method buscarMaterialEcologico(listaFiltrada){
-		//siendo listaFiltrada una lista que ya paso por buscarMateriales(mochila)
-		
-		if(listaFiltrada.any({m => m.serVivo()}))
-			 return listaFiltrada.find({m => m.serVivo()})
-		else 
-			 return listaFiltrada.find({m => !m.esRadioactivo()})
-	}
-	
+	method buscarMateriales(_mochila)	
 	
 	method consecuencia(mochila, companiero, materiales)
 	
 	method puedeRealizarse(mochila) = !self.buscarMateriales(mochila).isEmpty()
-	method realizar(mochila,companiero) {
+	
+	method realizar(mochila, companiero, estrategia) {
 		if (self.puedeRealizarse(mochila)) {
-			var materiales = self.buscarMateriales(mochila)
+			var materiales = estrategia.aplicarEstrategia(self, mochila) //obtengo los materiales de acuerdo a la estrategia
 			mochila.removeAll(materiales)
 			self.consecuencia(mochila, companiero, materiales)
 		}

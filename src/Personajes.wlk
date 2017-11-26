@@ -1,5 +1,6 @@
 import Materiales.*
 import Experimentos.*
+import Estrategias.*
 
 /************************************************************************************************/
 object morty{
@@ -47,6 +48,7 @@ object rick {
 	var mochila = #{}
 	var companiero = morty // el enunciado aclara que en este caso el compañero es Morty, pero en otros universos puede cambiar.
 	var experimentos = #{construirBateria, construirCircuito, shockElectrico}
+	var estrategia = alAzar
 	
 	method asignarCompanero(unCompanero){
 		companiero = unCompanero
@@ -60,6 +62,11 @@ object rick {
 	
 	method mochila() = mochila // Este método devuelve la lista con todos los materiales de la mochila.
 	method companiero() = companiero
+	method estrategia() = estrategia
+	
+	method estrategia(_unaEstrategia){
+		estrategia = _unaEstrategia
+	}
 	
 	method recibir(unosMateriales){
 		mochila.addAll(unosMateriales)
@@ -70,7 +77,8 @@ object rick {
 	}
 	
 	method realizar(unExperimento) {
-		unExperimento.realizar(mochila, companiero)
+		
+		unExperimento.realizar(mochila, companiero, estrategia)
 	}
 	
 }

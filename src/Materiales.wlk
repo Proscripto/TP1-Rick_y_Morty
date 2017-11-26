@@ -54,7 +54,6 @@ class Cable inherits Material {
 class Fleeb inherits Material {
 	var materiales = #{}
 	var anios
-	var serVivo = true
 	
 	constructor(_materiales, _anios){
 		materiales.add(_materiales)
@@ -68,7 +67,7 @@ class Fleeb inherits Material {
 	override method conduceE() = materiales.max({m => m.conduceE()}).conduceE()
 	override method esRadioactivo() = anios > 15
 	override method generaE() = materiales.min({m => m.generaE()}).generaE()
-	method serVivo() = serVivo //agregado para pregunta en buscarMaterialEcologico--Experimento
+	
 	
 	override method energiaNecesaria() = self.grMetal() * 2
 	override method descontarEnergia(companiero) {
