@@ -12,43 +12,40 @@ import Materiales.*
 object alAzar {
 	
 	//Se elige cualquier elemento de la mochila que cumple con el requisito
-	method aplicarEstrategia(_experimento,_mochila){
+	method aplicarEstrategia(_lista){
 		
-		return _experimento.buscarMateriales(_mochila) 
+		return _lista // _lista.sort().first()  o _lista.anyOne()
 		
-		//traer el primero o devolver el primero de un sort de la lista en el buscarMateriales(mochila) de cada Experimento????????
-		//mochila.filter(cond).first() 
-		//return mochila.filter(cond).sort().first()
 	}
 }
 
 object menorCantidadDeMetal{
 	
-	//de todos los elementos que cumplen el requisito, aquel que tiene la menor cantidad de metal
-	method aplicarEstrategia(_experimento,_mochila){
+	//de todos los elementos de la lista, aquel que tiene la menor cantidad de metal
+	method aplicarEstrategia(_lista){
 		
-		return _experimento.buscarMateriales(_mochila).min({m => m.grMetal()})
+		return [_lista.min({m => m.grMetal()})]
 	
 	}
 }
 
 object mejorGeneradorElectrico{
 	
-	//de todos los elementos que cumplen el requisito, aquel que produce la mayor cantidad de energía
-	method aplicarEstrategia(_experimento,_mochila){
+	//de todos los elementos de la lista, aquel que produce la mayor cantidad de energía
+	method aplicarEstrategia(_lista){
 		
-		return _experimento.buscarMateriales(_mochila).max({m => m.generaE()})
+		return [_lista.max({m => m.generaE()})]
 		
 	}
 }
 object ecologico{
 	
-	//De entre todos los elementos que cumplen el requisito, intenta utilizar un ser vivo.
+	//De todos los elementos de la lista, intenta utilizar un ser vivo.
 	//En caso de que ninguno lo sea, intenta usar un elemento que no sea radiactivo.
-	method aplicarEstrategia(_experimento,_mochila){
+	method aplicarEstrategia(_lista){
 		
-		return _experimento.buscarMateriales(_mochila).find({m => m.estaVivo()}) or 
-				_experimento.buscarMateriales(_mochila).find({m => !m.esRadioactivo()}) 
+		return [_lista.find({m => m.estaVivo()}) or 
+				_lista.find({m => !m.esRadioactivo()}) or _lista.first()]
 	}
 }
 

@@ -73,12 +73,12 @@ object rick {
 	}
 	
 	method experimentosQuePuedeRealizar() {
-		return experimentos.filter({e => e.puedeRealizarse(mochila)})
+		return experimentos.filter({e => e.puedeRealizarse(self)})
 	}
 	
 	method realizar(unExperimento) {
 		
-		unExperimento.realizar(mochila, companiero, estrategia)
+		unExperimento.realizar(self)
 	}
 	
 }
