@@ -1,5 +1,6 @@
 import Materiales.*
 import Experimentos.*
+import Estrategias.*
 
 
 /************************************************************************************************/
@@ -54,7 +55,9 @@ class Personaje {
   	}
 }
 /************************************************************************************************/
+
 object morty inherits Personaje {
+
 	
 	
 	override method puedeRecolectar(_unMaterial){
@@ -71,13 +74,17 @@ object morty inherits Personaje {
 		}
 	}	
 	
-	override method puedeRecibir(unosMateriales){ return (mochila.size() + unosMateriales.size() < 3)}
-}
+
 /************************************************************************************************/
 object rick inherits Personaje {
 	
 	var experimentos = #{construirBateria, construirCircuito, shockElectrico}
+	var estrategia = alAzar
+  
+  method estrategia() = estrategia
 	
+	method estrategia(_unaEstrategia){ estrategia = _unaEstrategia }
+  
 	override method puedeRecolectar(_unMaterial){} // Eventualmente Rick no recolecta, pero en un futuro podría, por lo que queda el metodo "Abstracto"
 	
 	override method recolectar(_unMaterial){}  // Idem arriba 
@@ -85,11 +92,12 @@ object rick inherits Personaje {
 	override method puedeRecibir(unosMateriales){return true} // Rick no tiene limitación de cantidad en su mochila
 	
 	method experimentosQuePuedeRealizar() {
-		return experimentos.filter({e => e.puedeRealizarse(mochila)})
+		return experimentos.filter({e => e.puedeRealizarse(self)})
 	}
 	
 	method realizar(unExperimento) {
-		unExperimento.realizar(mochila, companiero)
+		
+		unExperimento.realizar(self)
 	}
 	
 }

@@ -1,6 +1,7 @@
 import Materiales.*
 import Experimentos.*
 import Personajes.*
+import Estrategias.*
 
 describe "Tests Rick" {
 	const lata10 = new Lata(10)
@@ -26,24 +27,45 @@ describe "Tests Rick" {
 	}
 	
 	test "Experimentos para Realizar1 (construirBateria)" {
-		assert.equals(#{ construirBateria, construirCircuito },rick.experimentosQuePuedeRealizar())
+		assert.equals(#{ construirBateria,shockElectrico, construirCircuito },rick.experimentosQuePuedeRealizar())
 	}
 	test "Experimentos para Realizar2 (shockElectrico)" {
 		rick.realizar(construirBateria)
 		assert.equals(#{ construirBateria, construirCircuito, shockElectrico },rick.experimentosQuePuedeRealizar())
 	}
-	test "Hcer Experimento (mochila)" {
+	test "Hacer Experimento (mochila)" {
 		const mochilaSobrante = #{ cable2000x2, materiaOscura }
 		rick.realizar(construirBateria)
 		assert.equals(mochilaSobrante,rick.mochila().intersection(mochilaSobrante))
 		assert.equals(3,rick.mochila().size())
 	}
-	test "Hcer Experimento (compañero)" {
+	test "Hacer Experimento (compañero)" {
 		//En este punto Morty tiene 20 de energia
 		rick.mochila().clear()
-		rick.mochila().add(new Bateria(#{lata10})) //generaE = grMetal(10) * 2
+		rick.mochila().add(new Bateria(#{lata10,fleeb})) //generaE = grMetal(10) * 2
 		rick.mochila().add(lata10) //conduceE = 0.1 * _grMetal(10)
 		rick.realizar(shockElectrico)
 		assert.equals((20+20),rick.companiero().energia())
 	}
+	
+	test "Test contruir una bateria con estrategia de menorCantidadDeMetal"{
+		
+		rick.estrategia(menorCantidadDeMetal) //por defecto elige al azar
+		rick.mochila().clear()
+		var lata333 = new Lata(333)
+		var lata350 = new Lata(350)
+
+		rick.mochila().add(lata333)
+		rick.mochila().add(lata350)
+		rick.mochila().add(lata250)
+		rick.mochila().add(lata10)
+		rick.mochila().add(fleeb)
+		rick.realizar(construirBateria)
+		
+		var mochilaSobrante = #{lata10,lata333,new Bateria(#{lata250,fleeb}),lata350}
+		
+		assert.equals( mochilaSobrante,rick.mochila() )
+			
+	}
+	
 }
