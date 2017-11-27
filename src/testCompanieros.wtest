@@ -1,0 +1,92 @@
+import Materiales.*
+import Experimentos.*
+import Personajes.*
+import Humor.*
+
+describe "Tests Morty" {
+	const lata100 = new Lata(100)
+	const lata250 = new Lata(250)
+	const cable2000x2 = new Cable(2000,2)
+	const cable3000x2 = new Cable(3000,2)
+	const fleeb = new Fleeb(lata250,14)
+	const materiaOscura = new MateriaOscura(cable3000x2)
+	
+	fixture {
+		morty.recuperarEnergia(104)
+		morty.recolectar(lata100)//EnergiaConsumida 100
+		morty.recolectar(cable2000x2)//EnergiaConsumida 104
+    }
+	
+	test "Morty - Energia Consumida" {
+		morty.recuperarEnergia(6)
+		morty.recolectar(materiaOscura)//EnergiaConsumida 110
+		assert.equals(0,morty.energia())
+	}
+	test "Morty - Recolectar Fleeb" {
+		// Necesita para recolectarlo el doble de la energia de lata250 y al consumirlo entrega 10
+		morty.recuperarEnergia(500)
+		morty.recolectar(fleeb)
+		assert.equals(510,morty.energia())
+	}
+	test "Morty - Recoleccion Error" {
+		morty.recuperarEnergia(6)
+		morty.recolectar(materiaOscura)//EnergiaConsumida 110
+		assert.throwsExceptionWithMessage("No se pudo recolectar", {morty.recolectar(fleeb)})
+	}
+	test "Morty - Dar Materiales" {
+		morty.darObjetosA(rick)
+		assert.equals(#{}, morty.mochila())
+	}
+	test "Morty - Material ParasitoAlienigena"{
+		morty.recuperarEnergia(20)
+		morty.recolectar(new ParasitoAlienigena([{comp => comp.darObjetosA(rick)}
+									,{comp => comp.reducirEnergia(10)}
+									,{comp => comp.recolectar(new Lata(5))}
+									,{comp => comp.recolectar(new Lata(5))}
+									,{comp => comp.descartarMaterialAlAzar()}]))
+		assert.equals(0, morty.energia())
+		assert.equals(1, morty.mochila().size())
+	}
+	/*************************************************************************/
+	test "Summer - Energia Consumida" {
+		summer.recuperarEnergia(100)
+		summer.recolectar(lata100)//EnergiaConsumida 100
+		assert.equals(0,summer.energia())
+	}
+	test "Summer - Mochila" {
+		// Necesita para recolectarlo el doble de la energia de lata250 y al consumirlo entrega 10
+		summer.recuperarEnergia(500)
+		summer.recolectar(lata100)
+		summer.recolectar(lata250)
+		assert.throwsExceptionWithMessage("No se pudo recolectar",{summer.recolectar(cable2000x2)})
+	}
+	/*************************************************************************/
+	test "Jerry - Energia Consumida" {
+		jerry.recuperarEnergia(100)
+		jerry.darObjetosA(rick) //Pone a Jerry de mal humor
+		jerry.recolectar(lata100)
+		assert.equals(0,jerry.energia())
+	}
+	test "Jerry - Buen Humor - Mochila" {
+		// Necesita para recolectarlo el doble de la energia de lata250 y al consumirlo entrega 10
+		jerry.recuperarEnergia(500)
+		jerry.recolectar(lata100)
+		jerry.recolectar(lata250)
+		jerry.recolectar(cable3000x2)
+		assert.throwsExceptionWithMessage("No se pudo recolectar",{jerry.recolectar(cable2000x2)})
+	}
+	test "Jerry - Mal Humor - Mochila" {
+		// Necesita para recolectarlo el doble de la energia de lata250 y al consumirlo entrega 10
+		jerry.recuperarEnergia(500)
+		jerry.darObjetosA(rick) //Pone a Jerry de mal humor
+		jerry.recolectar(lata100)
+		assert.throwsExceptionWithMessage("No se pudo recolectar",{jerry.recolectar(cable2000x2)})
+	}
+	test "Jerry - Sobre Exitado" {
+		// Necesita para recolectarlo el doble de la energia de lata250 y al consumirlo entrega 10
+		jerry.recuperarEnergia(500)
+		var bateria = new Bateria(#{lata100,fleeb})
+		jerry.recolectar(bateria)
+		assert.equals(sobreExcitado,jerry.humor())
+	}
+}

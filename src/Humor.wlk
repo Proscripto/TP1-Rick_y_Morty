@@ -7,7 +7,7 @@ class Humor {
 	method recolectar(unPersonaje, _unMaterial){
 		if(self.puedeRecolectar(unPersonaje, _unMaterial)){
 			unPersonaje.mochila().add(_unMaterial)
-			_unMaterial.descontarEnergia(self)
+			_unMaterial.descontarEnergia(unPersonaje)
 			
 		}
 		else {

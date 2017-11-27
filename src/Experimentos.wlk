@@ -8,17 +8,17 @@ class Experimento {
 		return _mochila.filter(_condicion)
 	}
 	
-	method buscarMateriales(rick)	
+	method buscarMateriales(unaPersona)	
 	
-	method consecuencia(rick, materiales)
+	method consecuencia(unaPersona, materiales)
 	
-	method puedeRealizarse(rick) = !self.buscarMateriales(rick).isEmpty()
+	method puedeRealizarse(unaPersona) = !self.buscarMateriales(unaPersona).isEmpty()
 	
-	method realizar(rick) {
-		if (self.puedeRealizarse(rick)) {
-			var materiales = self.buscarMateriales(rick) 
-			rick.mochila().removeAll(materiales)
-			self.consecuencia(rick, materiales)
+	method realizar(unaPersona) {
+		if (self.puedeRealizarse(unaPersona)) {
+			var materiales = self.buscarMateriales(unaPersona) 
+			unaPersona.mochila().removeAll(materiales)
+			self.consecuencia(unaPersona, materiales)
 		}
 		else {
 			self.error("No se puede realizar el experimento.")
@@ -30,25 +30,25 @@ object construirBateria inherits Experimento {
 	const condMat1 = { m => m.grMetal() > 200 }
 	const condMat2 = { m => m.esRadioactivo() }
 	
-	override method buscarMateriales(rick){
-		return rick.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(rick.mochila(), condMat1) ) +
-				rick.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(rick.mochila(), condMat2) )
+	override method buscarMateriales(unaPersona){
+		return unaPersona.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(unaPersona.mochila(), condMat1) ) +
+				unaPersona.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(unaPersona.mochila(), condMat2) )
 	}
 	
-	override method consecuencia(rick, materiales) {
-		rick.mochila().add(new Bateria(materiales))
-		rick.companiero().reducirEnergia(5)
+	override method consecuencia(unaPersona, materiales) {
+		unaPersona.mochila().add(new Bateria(materiales))
+		unaPersona.companiero().reducirEnergia(5)
 	}
 }
 /************************************************************/
 object construirCircuito inherits Experimento {
 	
-	override method buscarMateriales(rick){
-		return rick.mochila().filter({m => m.conduceE() >= 5})
+	override method buscarMateriales(unaPersona){
+		return unaPersona.mochila().filter({m => m.conduceE() >= 5})
 	}
 	
-	override method consecuencia(rick, materiales) {
-		rick.mochila().add(new Circuito(materiales))
+	override method consecuencia(unaPersona, materiales) {
+		unaPersona.mochila().add(new Circuito(materiales))
 	}
 }
 /************************************************************/
@@ -56,12 +56,12 @@ object shockElectrico inherits Experimento {
 	const condMat1 = {m => m.generaE() > 0}
 	const condMat2 = {m => m.conduceE() > 0}
 	
-	override method buscarMateriales(rick){
-		 return rick.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(rick.mochila(), condMat1) ) +
-				rick.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(rick.mochila(), condMat2) )
+	override method buscarMateriales(unaPersona){
+		 return unaPersona.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(unaPersona.mochila(), condMat1) ) +
+				unaPersona.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(unaPersona.mochila(), condMat2) )
 	}
 	
-	override method consecuencia(rick, materiales) {
-		rick.companiero().recuperarEnergia(materiales.first().generaE() * materiales.last().conduceE())
+	override method consecuencia(unaPersona, materiales) {
+		unaPersona.companiero().recuperarEnergia(materiales.first().generaE() * materiales.last().conduceE())
 	}
 }

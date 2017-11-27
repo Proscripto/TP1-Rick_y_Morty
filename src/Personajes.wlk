@@ -112,7 +112,7 @@ object summer inherits Personaje {
 	
 	override method darObjetosA(_unCompanero){
 		super(_unCompanero)
-		_unCompanero.reducirEnergia(costoEnergiaPorEntrega)
+		self.reducirEnergia(costoEnergiaPorEntrega)
 	}
 }
 
@@ -120,6 +120,8 @@ object summer inherits Personaje {
 
 object jerry inherits Personaje {
 	var humor = buenHumor
+	
+	method humor() = humor
 	
 	override method puedeRecolectar(_unMaterial) = humor.puedeRecolectar(self)
 	

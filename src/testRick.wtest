@@ -63,9 +63,7 @@ describe "Tests Rick" {
 		rick.mochila().add(fleeb)
 		rick.realizar(construirBateria)
 		
-		var mochilaSobrante = #{lata10,lata333,new Bateria(#{lata250,fleeb}),lata350}
-		
-		assert.equals(mochilaSobrante,rick.mochila())
+		assert.notThat(rick.mochila().contains(lata250))
 			
 	}
 	
