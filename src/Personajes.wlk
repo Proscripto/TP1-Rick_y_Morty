@@ -1,6 +1,7 @@
 import Materiales.*
 import Experimentos.*
 import Estrategias.*
+import Humor.*
 
 
 /************************************************************************************************/
@@ -10,10 +11,15 @@ class Personaje {
 	var companiero
 	var mochila = #{}
 	
-	method asignarCompanero(unCompanero){
-		companiero = unCompanero
-	}
+	method asignarCompanero(unCompanero) { companiero = unCompanero }
 	
+	method energia() = energia
+	method companiero() = companiero
+	method mochila() = mochila
+	
+	method reducirEnergia(_energia){ energia = (energia - _energia).max(0) }
+  	method recuperarEnergia(_energia){ energia += _energia }
+  	
 	method puedeRecolectar(_unMaterial)
 	
 	method recolectar(_unMaterial)
@@ -25,30 +31,16 @@ class Personaje {
 		mochila.clear()
 	}
 	
-	method energia() = energia
-	
-	method mochila() = mochila // Este método devuelve la lista con todos los materiales de la mochila.
-	
-	method companiero() = companiero
-	
 	method recibir(unosMateriales){
 		if (self.puedeRecibir(unosMateriales)){
-			mochila.union(unosMateriales)
+			mochila.addAll(unosMateriales)
 		}
 		else{
 			self.error("La mochila del Compañero no tiene suficiente lugar")
 		}
 	}
 	
-	method reducirEnergia(_energia){
-		energia = (energia - _energia).max(0)
-	}
-  	
-  	method recuperarEnergia(_energia){
-  		energia += _energia
-  	}
-  	
-  	method descartarMaterialAlAzar() {
+	method descartarMaterialAlAzar() {
   		if (!mochila.isEmpty()){
   			mochila.remove(mochila.anyOne())
   		}
@@ -57,11 +49,10 @@ class Personaje {
 /************************************************************************************************/
 
 object morty inherits Personaje {
-
-	
+	const capacidadMochila = 3
 	
 	override method puedeRecolectar(_unMaterial){
-		return energia >= _unMaterial.energiaNecesaria() and mochila.size() < 3   //maximo 3 materiales a la vez.
+		return energia >= _unMaterial.energiaNecesaria() and mochila.size() < capacidadMochila  //maximo 3 materiales a la vez.
 	}
 	
 	override method recolectar(_unMaterial){
@@ -74,29 +65,25 @@ object morty inherits Personaje {
 		}
 	}	
 	
-
+	override method puedeRecibir(unosMateriales){ return (mochila.size() + unosMateriales.size() < 2)}
+}
 /************************************************************************************************/
 object rick inherits Personaje {
 	
 	var experimentos = #{construirBateria, construirCircuito, shockElectrico}
 	var estrategia = alAzar
-  
-  method estrategia() = estrategia
-	
+	  
+	method estrategia() = estrategia
 	method estrategia(_unaEstrategia){ estrategia = _unaEstrategia }
-  
 	override method puedeRecolectar(_unMaterial){} // Eventualmente Rick no recolecta, pero en un futuro podría, por lo que queda el metodo "Abstracto"
-	
 	override method recolectar(_unMaterial){}  // Idem arriba 
-	
-	override method puedeRecibir(unosMateriales){return true} // Rick no tiene limitación de cantidad en su mochila
+	override method puedeRecibir(unosMateriales) = true // Rick no tiene limitación de cantidad en su mochila
 	
 	method experimentosQuePuedeRealizar() {
 		return experimentos.filter({e => e.puedeRealizarse(self)})
 	}
 	
 	method realizar(unExperimento) {
-		
 		unExperimento.realizar(self)
 	}
 	
@@ -104,11 +91,11 @@ object rick inherits Personaje {
 /************************************************************************************************/
 
 object summer inherits Personaje {
-	
-	const energiaQueDescuenta = 10
+	const capacidadMochila = 2
+	const costoEnergiaPorEntrega = 10
 	
 	override method puedeRecolectar(_unMaterial){
-		return energia >= (_unMaterial.energiaNecesaria()*0.8) and mochila.size() < 2   // Usa un 20% menos de Energía que Morty, y solo carga de a 2 materiales.
+		return energia >= (_unMaterial.energiaNecesaria()*0.8) and mochila.size() < capacidadMochila   // Usa un 20% menos de Energía que Morty, y solo carga de a 2 materiales.
 	}
 	
 	override method recolectar(_unMaterial){
@@ -125,91 +112,33 @@ object summer inherits Personaje {
 	
 	override method darObjetosA(_unCompanero){
 		super(_unCompanero)
-		_unCompanero.reducirEnergia(energiaQueDescuenta)
+		_unCompanero.reducirEnergia(costoEnergiaPorEntrega)
 	}
 }
 
 /**************************************************************************************************/
 
 object jerry inherits Personaje {
-	
 	var humor = buenHumor
 	
-	method humor(){   
-
-		if (rick.companiero() == self){ 
-			 humor = malHumor
-		}
-		if (mochila.any({elem => elem.estaVivo()})){ 
+	override method puedeRecolectar(_unMaterial) = humor.puedeRecolectar(self)
+	
+	override method recolectar(_unMaterial){
+		humor.recolectar(self, _unMaterial)
+		if (_unMaterial.estaVivo()) { 
 			humor = buenHumor
 		}
-		if (mochila.any({elem => elem.esRadioactivo()})){
-			humor = sobreexcitado
-		}
-	} 
-	
-	override method puedeRecolectar(_unMaterial){
-	
-		return (humor.puedeRecolectar())
-	}
-	
-	override method recolectar(_unMaterial){
-
-		humor.recolectar(_unMaterial)
-	}	
-	
-	override method puedeRecibir(unosMateriales){ return ((mochila.size() + unosMateriales.size()) < 3)}
-}
-
-/**********Clases de Humor para Jerry***********/
-
-class Humor {
-	
-	method puedeRecolectar(_unMaterial)
-	
-	method recolectar(_unMaterial){
-		if(self.puedeRecolectar(_unMaterial)){
-			jerry.recibir(_unMaterial)
-			_unMaterial.descontarEnergia(self)
-		}
-		else {
-			self.error("No se pudo recolectar")
-		}
-	}
-}
-
-object buenHumor inherits Humor {
-	
-	override method puedeRecolectar(_unMaterial){
-		return ((jerry.energia() >= _unMaterial.energiaNecesaria()) and (jerry.mochila().size() < 3))   //maximo 3 materiales a la vez. Idem a Morty
-	}	
-}
-
-object malHumor inherits Humor {
-	
-	override method puedeRecolectar(_unMaterial){
-		return ((jerry.energia() >= _unMaterial.energiaNecesaria()) and (jerry.mochila().size() < 1))
-	}	
-}
-
-object sobreexcitado inherits Humor {
-	
-	override method puedeRecolectar(_unMaterial){
-		return ((jerry.energia() >= _unMaterial.energiaNecesaria()) and (jerry.mochila().size() < 6))
-	}
-	
-	override method recolectar(_unMaterial){
-		super(_unMaterial)
-		self.soltarTodo()
-	}
-	
-	method soltarTodo(){    //Este método tira todo lo de la mochila, pues si se pasa la mochila a si mismo luego hace un clear(mochila) y pierde todo
-		if (self.randomBoolean()){
-			jerry.darObjetosA(jerry)
+		else if (_unMaterial.esRadioactivo()) {
+			humor = sobreExcitado
 		}
 	}
 	
-	method randomBoolean(){
-		return ([true,false,false,false].anyOne())			
+	override method puedeRecibir(unosMateriales) = humor.puedeRecibir(self,unosMateriales)
+	
+	override method darObjetosA(_unCompanero){
+		super(_unCompanero)
+		humor = malHumor
 	}
 }
+
+

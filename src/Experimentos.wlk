@@ -5,7 +5,6 @@ import Estrategias.*
 class Experimento {
 	
 	method buscarCiertosMateriales(_mochila, _condicion){
-		
 		return _mochila.filter(_condicion)
 	}
 	
@@ -32,10 +31,8 @@ object construirBateria inherits Experimento {
 	const condMat2 = { m => m.esRadioactivo() }
 	
 	override method buscarMateriales(rick){
-	
 		return rick.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(rick.mochila(), condMat1) ) +
 				rick.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(rick.mochila(), condMat2) )
-	
 	}
 	
 	override method consecuencia(rick, materiales) {
@@ -47,9 +44,7 @@ object construirBateria inherits Experimento {
 object construirCircuito inherits Experimento {
 	
 	override method buscarMateriales(rick){
-	
-		return rick.estrategia().aplicarEstrategia( rick.mochila().filter({m => m.conduceE() >= 5}) )
-		
+		return rick.mochila().filter({m => m.conduceE() >= 5})
 	}
 	
 	override method consecuencia(rick, materiales) {
@@ -62,7 +57,6 @@ object shockElectrico inherits Experimento {
 	const condMat2 = {m => m.conduceE() > 0}
 	
 	override method buscarMateriales(rick){
-	
 		 return rick.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(rick.mochila(), condMat1) ) +
 				rick.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(rick.mochila(), condMat2) )
 	}

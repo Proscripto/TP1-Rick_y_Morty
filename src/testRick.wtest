@@ -12,6 +12,7 @@ describe "Tests Rick" {
 	const materiaOscura = new MateriaOscura(cable3000x2)
 	
 	fixture {
+		rick.asignarCompanero(morty)
 		morty.recuperarEnergia(280)
 		morty.recolectar(lata250) //Para construirBateria y construirCircuito
 		morty.recolectar(cable2000x2) //Para construirCircuito
@@ -45,7 +46,7 @@ describe "Tests Rick" {
 		rick.mochila().add(new Bateria(#{lata10,fleeb})) //generaE = grMetal(10) * 2
 		rick.mochila().add(lata10) //conduceE = 0.1 * _grMetal(10)
 		rick.realizar(shockElectrico)
-		assert.equals((20+20),rick.companiero().energia())
+		assert.equals((20+40),rick.companiero().energia())
 	}
 	
 	test "Test contruir una bateria con estrategia de menorCantidadDeMetal"{
@@ -64,7 +65,7 @@ describe "Tests Rick" {
 		
 		var mochilaSobrante = #{lata10,lata333,new Bateria(#{lata250,fleeb}),lata350}
 		
-		assert.equals( mochilaSobrante,rick.mochila() )
+		assert.equals(mochilaSobrante,rick.mochila())
 			
 	}
 	
