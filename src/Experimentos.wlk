@@ -3,12 +3,42 @@ import Estrategias.*
 
 /************************************************************/
 class Experimento {
+	var condiciones
 	
-	method buscarCiertosMateriales(_mochila, _condicion){
-		return _mochila.filter(_condicion)
+	constructor(condMat1) { condiciones = [condMat1] }
+	constructor(condMat1, condMat2) { condiciones = [condMat1, condMat2] }
+	
+	
+	method buscar1Material(unaPersona, condMat1){
+		var setCondMat1 = unaPersona.mochila().filter(condMat1)
+		var respuesta = []
+		if (!setCondMat1.isEmpty()) {
+			respuesta.add(unaPersona.estrategia().aplicarEstrategia(setCondMat1))
+		}
+		return respuesta
+	}
+	method buscar2Materiales(unaPersona, condMat1, condMat2){
+		var setCondMat1 = unaPersona.mochila().filter(condMat1)
+		var setCondMat2 = unaPersona.mochila().filter(condMat2)
+		var respuesta = []
+		if (!setCondMat1.isEmpty() && !setCondMat2.isEmpty()) {
+			respuesta.add(unaPersona.estrategia().aplicarEstrategia(setCondMat1))
+			respuesta.add(unaPersona.estrategia().aplicarEstrategia(setCondMat2))
+		}
+		return respuesta
 	}
 	
-	method buscarMateriales(unaPersona)	
+	method buscarMateriales(unaPersona)	{
+		if (condiciones.size() == 1){
+			return self.buscar1Material(unaPersona, condiciones.first())
+		}
+		else if (condiciones.size() == 2){
+			return self.buscar2Materiales(unaPersona, condiciones.first(), condiciones.last())
+		}
+		else {
+			return []
+		}
+	}
 	
 	method consecuencia(unaPersona, materiales)
 	
@@ -26,14 +56,7 @@ class Experimento {
 	}
 }
 /************************************************************/
-object construirBateria inherits Experimento {
-	const condMat1 = { m => m.grMetal() > 200 }
-	const condMat2 = { m => m.esRadioactivo() }
-	
-	override method buscarMateriales(unaPersona){
-		return unaPersona.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(unaPersona.mochila(), condMat1) ) +
-				unaPersona.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(unaPersona.mochila(), condMat2) )
-	}
+object construirBateria inherits Experimento({m => m.grMetal() > 200}, { m => m.esRadioactivo() }) {
 	
 	override method consecuencia(unaPersona, materiales) {
 		unaPersona.mochila().add(new Bateria(materiales))
@@ -41,25 +64,14 @@ object construirBateria inherits Experimento {
 	}
 }
 /************************************************************/
-object construirCircuito inherits Experimento {
-	
-	override method buscarMateriales(unaPersona){
-		return unaPersona.mochila().filter({m => m.conduceE() >= 5})
-	}
+object construirCircuito inherits Experimento({m => m.conduceE() >= 5}) {
 	
 	override method consecuencia(unaPersona, materiales) {
 		unaPersona.mochila().add(new Circuito(materiales))
 	}
 }
 /************************************************************/
-object shockElectrico inherits Experimento {
-	const condMat1 = {m => m.generaE() > 0}
-	const condMat2 = {m => m.conduceE() > 0}
-	
-	override method buscarMateriales(unaPersona){
-		 return unaPersona.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(unaPersona.mochila(), condMat1) ) +
-				unaPersona.estrategia().aplicarEstrategia( self.buscarCiertosMateriales(unaPersona.mochila(), condMat2) )
-	}
+object shockElectrico inherits Experimento({m => m.generaE() > 0}, {m => m.conduceE() > 0}) {
 	
 	override method consecuencia(unaPersona, materiales) {
 		unaPersona.companiero().recuperarEnergia(materiales.first().generaE() * materiales.last().conduceE())

@@ -28,6 +28,7 @@ describe "Tests Rick" {
 	}
 	
 	test "Experimentos para Realizar1 (construirBateria)" {
+		rick.mochila().add(new Bateria([lata250,fleeb]))
 		assert.equals(#{ construirBateria,shockElectrico, construirCircuito },rick.experimentosQuePuedeRealizar())
 	}
 	test "Experimentos para Realizar2 (shockElectrico)" {
