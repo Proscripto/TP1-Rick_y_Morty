@@ -97,10 +97,11 @@ object summer inherits Companiero {
 
 object jerry inherits Companiero {
 	var humor = buenHumor
-	var sobreExitado = false
+	
+	method sobreExitado() = self.mochila().any({mat => mat.esRadioactivo()})
 	
 	override method capacidadMochila() {
-		if (sobreExitado) {
+		if (self.sobreExitado()) {
 			return humor.capacidadMochila() * 2
 		}
 		else {
@@ -111,22 +112,19 @@ object jerry inherits Companiero {
 	override method puedeRecolectar(_unMaterial) = super(_unMaterial) && (energia >= _unMaterial.energiaNecesaria())
 	
 	override method recolectar(_unMaterial){
+		if (self.sobreExitado()) { self.soltarTodoRandom() }
 		super(_unMaterial)
-		if (sobreExitado) { self.soltarTodoRandom() }
 		if (_unMaterial.estaVivo()) { humor = buenHumor }
-		if (_unMaterial.esRadioactivo()) { sobreExitado = true }
 	}
 	method soltarTodoRandom(){
 		if ([true,false,false,false].anyOne()){
 			mochila.clear()
-			sobreExitado = false
 		}
 	}
 	
 	override method darObjetosA(_unCompanero){
 		super(_unCompanero)
 		humor = malHumor
-		sobreExitado = false
 	}
 }
 
