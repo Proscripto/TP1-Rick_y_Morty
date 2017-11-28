@@ -26,7 +26,16 @@ object mejorGeneradorElectrico{
 object ecologico{
 	//De todos los elementos de la lista, intenta utilizar un ser vivo.
 	//En caso de que ninguno lo sea, intenta usar un elemento que no sea radiactivo.
-	method aplicarEstrategia(_lista) = (_lista.filter({m => m.estaVivo()}) + _lista.filter({m => !m.esRadioactivo()})).first()
+	method aplicarEstrategia(_lista){
+		if(!_lista.filter({m => m.estaVivo()}).isEmpty()){
+			return _lista.filter({m => m.estaVivo()}).asList().first()
+		}
+		else if(_lista.filter({m => !m.esRadioactivo()}).isEmpty()){
+			return _lista.filter({m => !m.esRadioactivo()}).asList().first()
+		}
+		else
+			return []
+	}
 }
 
 

@@ -2,6 +2,7 @@ import Materiales.*
 import Experimentos.*
 import Personajes.*
 import Estrategias.*
+import Acciones.*
 
 describe "Tests Rick" {
 	const lata10 = new Lata(10)
@@ -68,4 +69,42 @@ describe "Tests Rick" {
 			
 	}
 	
+	test "Test contruir un shockElectrico con estrategia mejorGeneradorElectrico" {
+		
+		rick.estrategia(mejorGeneradorElectrico) //por defecto elige al azar
+		rick.mochila().clear()
+		
+		var parasitoIncrementaEnergia = new ParasitoAlienigena(new IncrementarEnergia(1)) //genera 5
+		var materiaGenera10 = new MateriaOscura(parasitoIncrementaEnergia) // genera el doble de su materiaBase 
+		
+		rick.mochila().add(parasitoIncrementaEnergia)
+		rick.mochila().add(materiaGenera10)
+		rick.mochila().add(cable3000x2)
+		
+		rick.realizar(shockElectrico)
+		
+		assert.notThat(rick.mochila().contains(materiaGenera10))
+		assert.that(rick.mochila().contains(parasitoIncrementaEnergia))
+	}
+	
+	test "Test contruir un circuito con la estrategia ecologica " {
+		
+		rick.estrategia(ecologico) //por defecto elige al azar
+		rick.mochila().clear()
+		
+		var fleebConduce25 = new Fleeb(lata250,19)
+		
+		rick.mochila().add(fleebConduce25) //conduce y esta vivo
+		rick.mochila().add(lata250) // conduce 25
+		rick.mochila().add(cable3000x2) //conduce 6
+
+		
+		rick.realizar(construirCircuito)
+		
+		assert.that(rick.mochila().contains(cable3000x2))
+		assert.that(rick.mochila().contains(lata250))
+		assert.notThat(rick.mochila().contains(fleebConduce25))	
+
+	}
 }
+	

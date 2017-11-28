@@ -73,7 +73,6 @@ class Fleeb inherits Material {
 	override method generaE() = materiales.min({m => m.generaE()}).generaE()
 
 	override method estaVivo() = true
-	//method serVivo() = self.estaVivo() //agregado para pregunta en buscarMaterialEcologico--Experimento
 
 	
 	override method energiaNecesaria() = self.grMetal() * 2
