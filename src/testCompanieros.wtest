@@ -2,6 +2,7 @@ import Materiales.*
 import Experimentos.*
 import Personajes.*
 import Humor.*
+import Acciones.*
 
 describe "Tests Morty" {
 	const lata100 = new Lata(100)
@@ -39,11 +40,11 @@ describe "Tests Morty" {
 	}
 	test "Morty - Material ParasitoAlienigena"{
 		morty.recuperarEnergia(20)
-		morty.recolectar(new ParasitoAlienigena([{comp => comp.darObjetosA(rick)}
-									,{comp => comp.reducirEnergia(10)}
-									,{comp => comp.recolectar(new Lata(5))}
-									,{comp => comp.recolectar(new Lata(5))}
-									,{comp => comp.descartarMaterialAlAzar()}]))
+		morty.recolectar(new ParasitoAlienigena([new EntregarMochila(rick)
+									,new DecrementarEnergia(10)
+									,new RecolectarMaterialOculto(new Lata(5))
+									,new RecolectarMaterialOculto(new Lata(5))
+									,new DescartarElementoAlAzar()]))
 		assert.equals(0, morty.energia())
 		assert.equals(1, morty.mochila().size())
 	}
@@ -51,7 +52,7 @@ describe "Tests Morty" {
 	test "Summer - Energia Consumida" {
 		summer.recuperarEnergia(100)
 		summer.recolectar(lata100)//EnergiaConsumida 100
-		assert.equals(0,summer.energia())
+		assert.equals(20,summer.energia())
 	}
 	test "Summer - Mochila" {
 		// Necesita para recolectarlo el doble de la energia de lata250 y al consumirlo entrega 10
@@ -87,6 +88,6 @@ describe "Tests Morty" {
 		jerry.recuperarEnergia(500)
 		var bateria = new Bateria(#{lata100,fleeb})
 		jerry.recolectar(bateria)
-		assert.equals(sobreExcitado,jerry.humor())
+		assert.equals(6,jerry.capacidadMochila())
 	}
 }

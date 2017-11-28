@@ -21,7 +21,8 @@ class Material {
 	method estaVivo()
 	
 	method energiaNecesaria() = self.grMetal() 
-	method descontarEnergia(companiero) { companiero.reducirEnergia(self.energiaNecesaria()) }
+	method consecuenciaRecoleccion(companiero) { companiero.reducirEnergia(self.energiaNecesaria()) }
+	method consecuenciaRecoleccion(companiero, porcentageConsumo) { companiero.reducirEnergia(self.energiaNecesaria() * porcentageConsumo) }
 }
 /************************************************************/
 class Lata inherits Material {
@@ -76,7 +77,7 @@ class Fleeb inherits Material {
 
 	
 	override method energiaNecesaria() = self.grMetal() * 2
-	override method descontarEnergia(companiero) {
+	override method consecuenciaRecoleccion(companiero) {
 		if (!self.esRadioactivo()) {
 			companiero.recuperarEnergia(10)
 		} 
@@ -100,8 +101,6 @@ class MateriaOscura inherits Material {
 	override method generaE() = materiaBase.generaE() * 2
 	override method estaVivo() = false
 	
-	override method energiaNecesaria() = self.grMetal() 
-	override method descontarEnergia(companiero) { companiero.reducirEnergia(self.energiaNecesaria()) }
 }
 /************************************************************/
 class ParasitoAlienigena inherits Material {
@@ -117,9 +116,9 @@ class ParasitoAlienigena inherits Material {
 	override method generaE() = 5
 	override method estaVivo() = true
 	
-	override method descontarEnergia(companiero) {
+	override method consecuenciaRecoleccion(companiero) {
 		//super(companiero)
-		acciones.forEach({a => a.apply(companiero)})
+		acciones.forEach({a => a.ejecutar(companiero)})
 	}
 }
 
